@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import math
 from collections.abc import Sequence
-from enum import Enum
+from enum import StrEnum
 
 from robotic_hand.config import FINGERS, HandConfig
 from robotic_hand.geometry import Point, angles_from_landmarks
 from robotic_hand.transport import Actuator
 
 
-class State(str, Enum):
+class State(StrEnum):
     DISARMED = "DISARMED"
     ARMED = "ARMED"
     TRACKING_LOST = "TRACKING_LOST"
@@ -136,7 +136,9 @@ class Controller:
         )
         try:
             if any_changed:
-                angles = tuple(int(round(targets[name])) for name in FINGERS)
+                rounded = [int(round(targets[name])) for name in FINGERS]
+                # An explicit five-element tuple matches the actuator protocol.
+                angles = (rounded[0], rounded[1], rounded[2], rounded[3], rounded[4])
                 self.actuator.send_angles(angles)
                 self._current.update(targets)
                 self.last_sent = now

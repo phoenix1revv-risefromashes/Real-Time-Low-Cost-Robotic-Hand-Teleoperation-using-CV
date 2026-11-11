@@ -2,38 +2,73 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   python:
+    name: Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ['3.11', '3.12', '3.13']
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install development dependencies
-        run: python -m pip install -e '.[dev]'
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install package and developer tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+
       - name: Unit tests
         run: python -m pytest -q
+
       - name: Lint
-        run: ruff check .
-      - name: Type check
-        run: mypy src/robotic_hand
-      - name: Hardware-free CLI smoke test
+        run: python -m ruff check .
+
+      - name: Strict static type checking
+        run: python -m mypy src/robotic_hand
+
+      - name: Hardware-free integration smoke test
         run: python -m robotic_hand --mode demo
 
   arduino:
+    name: Arduino UNO firmware
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: arduino/setup-arduino-cli@v2
-      - name: Install AVR toolchain
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      # Standalone Arduino CLI avoids deprecated Node 20 runtime in setup-arduino-cli@v2.
+      # Release v1.6.0 (2026-11-10); checksum verified against Arduino release assets.
+      - name: Install Arduino CLI
+        shell: bash
+        run: |
+          curl --fail --location --silent --show-error --retry 3 \
+            --output "$RUNNER_TEMP/arduino-cli.tar.gz" \
+            https://github.com/arduino/arduino-cli/releases/download/v1.6.0/arduino-cli_1.6.0_Linux_64bit.tar.gz
+          echo "321ee249f44c78053234fec0f36101092bc6021bf24939e15e0cc2449c5ed250  $RUNNER_TEMP/arduino-cli.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/arduino-cli.tar.gz" -C "$RUNNER_TEMP" arduino-cli
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+
+      - name: Install Arduino AVR core and Servo library
         run: |
           arduino-cli core update-index
           arduino-cli core install arduino:avr
-      - name: Compile controller firmware
-        run: arduino-cli compile --fqbn arduino:avr:uno hardware/firmware/robotic_hand_controller
+          arduino-cli lib install Servo
+
+      - name: Compile firmware for Arduino UNO
+        run: arduino-cli compile --warnings all --fqbn arduino:avr:uno hardware/firmware/robotic_hand_controller

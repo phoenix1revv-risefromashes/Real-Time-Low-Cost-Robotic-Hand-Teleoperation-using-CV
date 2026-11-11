@@ -4,13 +4,11 @@
 
 **A webcam-to-actuator robotic hand prototype using camera-based hand tracking, calibrated motion mapping, and an Arduino UNO.**
 
-[![CI](https://github.com/phoenix1revv-risefromashes/vision-guided-robotic-hand-teleoperation/actions/workflows/ci.yml/badge.svg)](https://github.com/phoenix1revv-risefromashes/vision-guided-robotic-hand-teleoperation/actions/workflows/ci.yml)
+[![CI](https://github.com/phoenix1revv-risefromashes/Low-cost-real-time-human-hand-motion-replication-using-computer-vision/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/phoenix1revv-risefromashes/Low-cost-real-time-human-hand-motion-replication-using-computer-vision/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13-3776AB?logo=python&logoColor=white)
 ![Arduino](https://img.shields.io/badge/Arduino-UNO-00979D?logo=arduino&logoColor=white)
 ![OpenCV](https://img.shields.io/badge/OpenCV-4.x-5C3EE8?logo=opencv&logoColor=white)
 ![MediaPipe](https://img.shields.io/badge/MediaPipe-Hand%20Landmarker-4285F4?logo=google&logoColor=white)
-![Local tests](https://img.shields.io/badge/Local%20Tests-19%20passed-2EA44F?logo=pytest&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-blue)
 
 [**Watch prototype demonstration**](media/robotic_hand_demo.mp4) · [**View circuit schematic**](hardware/reference/original_circuit_schematic.png) · [**Read system design**](docs/system_design.md) · [**Hardware setup**](docs/hardware_setup.md)
 
@@ -119,21 +117,6 @@ The **`--enable-hardware` and `--port` flags are both required** to transmit phy
 
 Further details: [hardware setup](docs/hardware_setup.md) · [calibration](docs/calibration.md) · [control architecture](docs/system_design.md).
 
-## Verification and CI
-
-The repository includes GitHub Actions jobs for Python **3.11 / 3.12 / 3.13** and for **Arduino UNO firmware compilation**.
-
-| Check | Coverage | Verification status |
-| --- | --- | --- |
-| Python unit tests | Config, geometry, control states, transport, protocol | **19 passed locally** |
-| Simulation smoke test | Full control path without physical motors | **Passed locally** |
-| Ruff / strict MyPy | Lint and static type checks | Configured in GitHub Actions; not verified in this environment |
-| Firmware compilation | `arduino:avr:uno` target | Configured in GitHub Actions; not verified in this environment |
-| GitHub Actions | Python matrix + Arduino firmware | **Pending first actual workflow run** |
-| Physical hardware integration | Servo motion, wiring, firmware ↔ host serial | **Not yet verified for the refactor** |
-
-The **CI badge at the top reflects the actual GitHub Actions workflow**, not a manually asserted green status. It will display a result after this repository is published at the linked GitHub path and the workflow runs successfully.
-
 ## Reported results (original prototype)
 
 The original experiment reported these outcomes; **they have not been reproduced for the refactored software**:
@@ -145,22 +128,6 @@ The original experiment reported these outcomes; **they have not been reproduced
 | “Efficiency” | **Above 90%** | Metric was not defined; **not** presented as tracking accuracy |
 
 See [validation notes](docs/validation.md) for repeatability, latency, and fault-injection test plans.
-
-## Project layout
-
-```text
-├── .github/workflows/ci.yml          # Python matrix + UNO firmware compile
-├── src/robotic_hand/                 # Tracking, geometry, control, transport, CLI
-├── hardware/firmware/                # Arduino UNO custom firmware
-├── hardware/reference/               # Original circuit and architecture images
-├── config/hand_config.json           # Per-finger calibration and control settings
-├── scripts/download_model.py         # External MediaPipe model downloader
-├── tests/                             # Automated Python test suite
-├── docs/                              # Design, hardware, calibration, validation
-├── media/                             # Original physical prototype + demo video
-├── archive/original/                  # Original source preserved unchanged
-└── pyproject.toml                     # Python package and tooling configuration
-```
 
 ## Engineering limitations and safety boundary
 
@@ -179,8 +146,6 @@ This remains a **research and bench prototype**. Physical integration requires i
 - [Finger calibration and controller parameters](docs/calibration.md)
 - [Verification evidence and performance limitations](docs/validation.md)
 
-## Author and license
+## Author
 
-**Phoenix Bogati** — original robotic hand prototype, demonstration, and project materials. The original implementation is preserved for provenance alongside the engineering refactor.
-
-Repository code is provided under the [MIT License](LICENSE). Third-party dependencies and externally downloaded MediaPipe assets remain subject to their respective licenses.
+**Phoenix Bogati** — original robotic hand prototype, demonstration, and project materials. Original implementation is preserved under [`archive/original/`](archive/original/).

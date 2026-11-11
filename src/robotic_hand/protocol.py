@@ -59,6 +59,6 @@ def decode_frame(data: bytes) -> Frame:
 
 
 def move_frame(sequence: int, angles: tuple[int, ...]) -> bytes:
-    if len(angles) != 5 or any(type(x) is not int or not 30 <= x <= 130 for x in angles):
+    if len(angles) != 5 or any(not isinstance(x, int) or isinstance(x, bool) or not 30 <= x <= 130 for x in angles):
         raise ValueError("Expected five integer angles in [30, 130]")
     return encode_frame(sequence, "MOVE", ",".join(map(str, angles)))

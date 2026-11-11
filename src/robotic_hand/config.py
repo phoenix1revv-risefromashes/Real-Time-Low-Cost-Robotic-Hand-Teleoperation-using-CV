@@ -12,6 +12,11 @@ FINGERS = ("thumb", "index", "middle", "ring", "pinky")
 PINS = (9, 10, 11, 12, 13)
 
 
+def _is_plain_int(value: object) -> bool:
+    """Reject booleans, which Python otherwise treats as integers."""
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
 @dataclass(frozen=True)
 class FingerConfig:
     pin: int
@@ -28,7 +33,7 @@ class FingerConfig:
         if not (0 <= self.metric_closed < self.metric_open <= 10):
             raise ValueError(f"{name}: require 0 <= closed metric < open metric <= 10")
         for angle in (self.servo_closed_deg, self.servo_open_deg):
-            if type(angle) is not int or not 30 <= angle <= 130:
+            if not _is_plain_int(angle) or not 30 <= angle <= 130:
                 raise ValueError(f"{name}: servo endpoints must be integer degrees in [30, 130]")
         if self.servo_closed_deg == self.servo_open_deg:
             raise ValueError(f"{name}: servo endpoints must differ")
@@ -55,11 +60,11 @@ class HandConfig:
             raise ValueError("Pin assignments must match the firmware's 9-13 mapping")
         for name in FINGERS:
             self.fingers[name].validate(name)
-        if type(self.camera_index) is not int or self.camera_index < 0:
+        if not _is_plain_int(self.camera_index) or self.camera_index < 0:
             raise ValueError("camera_index must be nonnegative integer")
-        if any(type(v) is not int or v < 1 for v in (self.camera_width, self.camera_height)):
+        if any(not _is_plain_int(v) or v < 1 for v in (self.camera_width, self.camera_height)):
             raise ValueError("Camera dimensions must be positive integers")
-        if type(self.mirror_camera) is not bool:
+        if not isinstance(self.mirror_camera, bool):
             raise ValueError("mirror_camera must be boolean")
         bounds = (
             (self.max_command_rate_hz, 1, 30, "max_command_rate_hz"),
@@ -72,7 +77,7 @@ class HandConfig:
             if not math.isfinite(value) or not lower <= value <= upper:
                 raise ValueError(f"{name} must be finite in [{lower}, {upper}]")
         if not (
-            type(self.required_stable_frames) is int
+            _is_plain_int(self.required_stable_frames)
             and 2 <= self.required_stable_frames <= 30
         ):
             raise ValueError("required_stable_frames must be integer in [2, 30]")
