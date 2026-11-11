@@ -1,0 +1,19 @@
+{
+  "camera_index": 0,
+  "camera_width": 640,
+  "camera_height": 480,
+  "mirror_camera": true,
+  "max_command_rate_hz": 20.0,
+  "max_servo_speed_deg_s": 120.0,
+  "ema_alpha": 0.35,
+  "deadband_deg": 1.0,
+  "tracking_loss_timeout_s": 0.25,
+  "required_stable_frames": 5,
+  "fingers": {
+    "thumb": {"pin": 9, "metric_closed": 0.45, "metric_open": 1.75, "servo_closed_deg": 50, "servo_open_deg": 110},
+    "index": {"pin": 10, "metric_closed": 0.85, "metric_open": 2.70, "servo_closed_deg": 50, "servo_open_deg": 110},
+    "middle": {"pin": 11, "metric_closed": 0.85, "metric_open": 3.00, "servo_closed_deg": 50, "servo_open_deg": 110},
+    "ring": {"pin": 12, "metric_closed": 0.85, "metric_open": 2.75, "servo_closed_deg": 50, "servo_open_deg": 110},
+    "pinky": {"pin": 13, "metric_closed": 0.65, "metric_open": 2.25, "servo_closed_deg": 50, "servo_open_deg": 110}
+  }
+}

@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install development dependencies
+        run: python -m pip install -e '.[dev]'
+      - name: Unit tests
+        run: python -m pytest -q
+      - name: Lint
+        run: ruff check .
+      - name: Type check
+        run: mypy src/robotic_hand
+      - name: Hardware-free CLI smoke test
+        run: python -m robotic_hand --mode demo
+
+  arduino:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-arduino-cli@v2
+      - name: Install AVR toolchain
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install arduino:avr
+      - name: Compile controller firmware
+        run: arduino-cli compile --fqbn arduino:avr:uno hardware/firmware/robotic_hand_controller

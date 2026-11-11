@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vision-guided-robotic-hand"
+version = "0.1.0"
+description = "Fail-closed vision-guided 5-DOF robotic hand prototype with testable control logic"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+license = {file = "LICENSE"}
+authors = [{name = "Phoenix Bogati"}]
+keywords = ["robotics", "teleoperation", "mediapipe", "opencv", "arduino"]
+classifiers = ["Programming Language :: Python :: 3", "Topic :: Scientific/Engineering"]
+dependencies = []
+
+[project.optional-dependencies]
+vision = ["numpy>=1.26,<3", "opencv-python>=4.8,<5", "mediapipe>=0.10.20,<0.11"]
+hardware = ["pyserial>=3.5,<4"]
+dev = ["pytest>=8,<10", "ruff>=0.9,<1", "mypy>=1.14,<2"]
+
+[project.scripts]
+robotic-hand = "robotic_hand.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["archive", "build", "dist"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src/robotic_hand"]
+
+[[tool.mypy.overrides]]
+module = ["cv2", "mediapipe", "serial"]
+ignore_missing_imports = true
