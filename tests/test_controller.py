@@ -84,7 +84,7 @@ def test_large_observation_gap_cannot_bypass_firmware_slew(cfg):
     controller.observe(hand(), 0.35)
     assert controller.state == State.ARMED
     second = fake.commands[-1]
-    assert max(abs(a - b) for a, b in zip(second, first)) <= 15
+    assert max(abs(a - b) for a, b in zip(second, first, strict=True)) <= 15
 
 
 def test_manual_stop_requires_fresh_frames_and_arm(cfg):
